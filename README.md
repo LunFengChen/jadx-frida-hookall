@@ -3,6 +3,7 @@
 一个简单但实用的 JADX 插件，提供涉及到 Java 层的常用 Frida Hook 脚本，每天帮助你省5分钟翻笔记的时间；
 
 组合快捷键 `Ctrl+Alt+H` 调出树形结构展示ui，提供复制剪切板和切换语言功能，实用且美观；
+> 对你有用的话给个star吧或者分享一下，感谢哇；
 
 ## 1. 脚本分类
 - Helper Functions（辅助函数）
@@ -20,52 +21,47 @@
     - JNI RegisterNatives 监控
 
 
-## 2.  编译与安装
+## 2. 安装方法
 
-### 2.1 准备 JADX JAR
+### 方式 1：直接下载安装（推荐）
 
-编译需要 JADX 的 JAR 文件，可从以下位置获取：
-- **已安装的 JADX**：`~/.local/share/jadx/lib/jadx-gui-*.jar`（Linux）
-- **JADX 源码**：`jadx/jadx-gui/build/libs/jadx-gui-dev-all.jar`
-- **下载发布版**：https://github.com/skylot/jadx/releases
+1. 从 [Releases](https://github.com/LunFengChen/jadx-frida-hookAll/releases) 页面下载最新的 `jadx-frida-hookall-x.x.x.jar`
+2. 在 JADX GUI 中：`Plugins` → `Install plugin` → 选择下载的 JAR 文件
+3. 重启 JADX
 
-### 2.2 编译插件
+### 方式 2：手动编译安装
 
-**Windows：**
-```powershell
-# 方式1：使用默认路径（脚本内配置）
-.\compile.ps1
+如果你想修改插件或贡献代码，请查看 [4. 扩展开发](#4-扩展开发) 章节。
 
-# 方式2：指定 JAR 路径
-.\compile.ps1 "C:\path\to\jadx-gui.jar"
+> **更新插件**：先卸载旧版本，重启 JADX，再安装新版本。
 
-# 方式3：使用环境变量
-$env:JADX_GUI_JAR="C:\path\to\jadx-gui.jar"
-.\compile.ps1
-```
 
-**Linux/Mac：**
+## 3. 使用方法
+
+### 3.1 打开插件
+
+两种方式：
+- **快捷键**：`Ctrl+Alt+H`
+- **菜单**：`Plugins` → `Frida Hook Templates`
+
+### 3.2 使用脚本
+
+1. 单击树节点查看脚本
+2. 点击"复制脚本"按钮
+3. 保存为 `.js` 文件
+4. 使用 Frida 加载：
+
 ```bash
-chmod +x compile.sh
-
-# 方式1：自动查找（常见路径）
-./compile.sh
-
-# 方式2：指定 JAR 路径
-./compile.sh /path/to/jadx-gui.jar
-
-# 方式3：使用环境变量
-export JADX_GUI_JAR=/path/to/jadx-gui.jar
-./compile.sh
+frida -U -f com.example.app -l hook.js
 ```
 
-### 2.3 安装插件
-在 JADX GUI 中：`Plugins` → `Install plugin` → 选择 `target/jadx-frida-hookall-1.0.0.jar` 
+### 3.3 切换语言
 
-> 如需更新插件，需要先卸载插件然后重启jadx，再次重新安装即可；
+- 插件会自动跟随 JADX 的语言设置
+- 也可以点击左下角按钮手动切换中英文
 
 
-## 3.  脚本示例
+## 4. 脚本示例
 
 1. 打印堆栈
 
@@ -88,15 +84,31 @@ export JADX_GUI_JAR=/path/to/jadx-gui.jar
     });
     ```
 
-## 4. 扩展开发
-只需要3步就行；我们接下来以监控弹窗为例；
-### 4.1 创建脚本文件
+## 5. 扩展开发
+
+想要添加新脚本或修改插件？只需 3 步！
+
+### 5.1 添加新脚本
+
+以添加"监控 Toast"为例：
+
+#### 步骤 1：创建脚本文件
 
 创建 `src/main/resources/frida-scripts/hook-android/monitor-toast.js`
 
-**可以在脚本内编写注释用于解释hook的作用**，在代码中可以标记贡献者id；
+```javascript
+// Monitor Toast messages
+// Author: YourName
+Java.perform(function() {
+    var Toast = Java.use('android.widget.Toast');
+    Toast.show.implementation = function() {
+        console.log('[Toast] ' + this.mText.value);
+        return this.show();
+    };
+});
+```
 
-### 4.2 注册脚本
+#### 步骤 2：注册脚本
 
 编辑 `HookAndroid.java`：
 ```java
@@ -106,14 +118,50 @@ public static final ScriptEntry MONITOR_TOAST = new ScriptEntry(
 );
 ```
 
-### 4.3 添加到ui树
+#### 步骤 3：添加到 UI 树
 
-编辑 `FridaScriptDialog.java`：
+编辑 `FridaScriptDialog.java` 的 `loadScriptTemplates()` 方法：
 ```java
 androidNode.add(createScriptNode(HookAndroid.MONITOR_TOAST));
 ```
 
-如果还是理解不了，可以参考下面的项目结构
+### 5.2 编译插件
+
+#### 准备 JADX JAR
+
+编译需要 JADX 的 JAR 文件：
+- **JADX 源码**：`jadx/jadx-gui/build/libs/jadx-gui-dev-all.jar`
+- **已安装的 JADX**：`~/.local/share/jadx/lib/jadx-gui-*.jar`（Linux）
+- **下载发布版或者二改版**：
+    - https://github.com/skylot/jadx/releases
+    - https://github.com/LunFengChen/jadx/releases
+
+#### Windows 编译
+
+```powershell
+# 使用默认路径
+.\compile.ps1
+
+# 或指定 JAR 路径
+.\compile.ps1 "C:\path\to\jadx-gui.jar"
+```
+
+#### Linux/Mac 编译
+
+```bash
+chmod +x compile.sh
+
+# 自动查找
+./compile.sh
+
+# 或指定路径
+./compile.sh /path/to/jadx-gui.jar
+```
+
+生成的插件：`target/jadx-frida-hookall-1.0.0.jar`
+
+### 5.3 项目结构
+
 ```
 src/main/
 ├── java/com/frida/jadx/
@@ -132,9 +180,21 @@ src/main/
     └── frida-advanced/
 ```
 
-### 4.4 提交贡献（可选）
-- 提交PR（推荐）
-- q群反馈：686725227
+### 5.4 贡献方式
+
+- **提交 PR**：https://github.com/LunFengChen/jadx-frida-hookAll
+- **反馈交流**：Q群 686725227
+
+
+## 6. 常见问题
+
+**Q: 快捷键不生效？**
+- 确保 JADX 窗口处于激活状态
+- 或使用菜单：`Plugins` → `Frida Hook Templates`
+
+**Q: 如何切换语言？**
+- 插件自动跟随 JADX 语言设置
+- 或点击左下角按钮手动切换
 
 ## 许可证
 Apache 2.0 License
