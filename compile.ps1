@@ -1,11 +1,24 @@
 # JADX Frida HookAll 编译脚本
 Write-Host "========== JADX Frida HookAll 编译 ==========" -ForegroundColor Cyan
 
-$jadxGuiJar = "C:\Users\xiaofeng\Desktop\projects\jadx\jadx-gui\build\libs\jadx-gui-dev-all.jar"
+# 从环境变量或参数获取 JADX JAR 路径
+if ($args.Count -gt 0) {
+    $jadxGuiJar = $args[0]
+} elseif ($env:JADX_GUI_JAR) {
+    $jadxGuiJar = $env:JADX_GUI_JAR
+} else {
+    # 默认路径（可根据实际情况修改）
+    $jadxGuiJar = "C:\Users\xiaofeng\Desktop\projects\jadx\jadx-gui\build\libs\jadx-gui-dev-all.jar"
+}
 
 # 检查 JADX JAR 是否存在
 if (-not (Test-Path $jadxGuiJar)) {
     Write-Host "✗ JADX JAR 文件不存在: $jadxGuiJar" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "请使用以下方式之一指定 JADX JAR 路径:" -ForegroundColor Yellow
+    Write-Host "  1. 参数传递: .\compile.ps1 'C:\path\to\jadx-gui-dev-all.jar'" -ForegroundColor Cyan
+    Write-Host "  2. 环境变量: `$env:JADX_GUI_JAR='C:\path\to\jadx-gui-dev-all.jar'" -ForegroundColor Cyan
+    Write-Host "  3. 修改脚本中的默认路径" -ForegroundColor Cyan
     exit 1
 }
 

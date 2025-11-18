@@ -1,0 +1,5 @@
+# 确保 shell 脚本使用 LF 换行符（Unix 风格）
+*.sh text eol=lf
+
+# 确保 PowerShell 脚本使用 CRLF 换行符（Windows 风格）
+*.ps1 text eol=crlf

@@ -10,8 +10,8 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 /**
- * Frida 脚本模板对话框
- * 使用树形结构展示不同类别的 Hook 脚本
+ * Frida script template dialog
+ * Displays different categories of Hook scripts in a tree structure
  */
 public class FridaScriptDialog extends JDialog {
     
@@ -39,17 +39,17 @@ public class FridaScriptDialog extends JDialog {
     }
 
     /**
-     * 初始化 UI 组件
+     * Initialize UI components
      */
     private void initUI() {
         setLayout(new BorderLayout(10, 10));
 
-        // 创建树形结构
+        // Create tree structure
         rootNode = new DefaultMutableTreeNode("Frida Hook Templates");
         scriptTree = new JTree(rootNode);
         scriptTree.setRootVisible(true);
         
-        // 设置树形选择监听 - 单击即可查看脚本
+        // Set tree selection listener - single click to view script
         scriptTree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) scriptTree.getLastSelectedPathComponent();
             if (node != null && node.getUserObject() instanceof ScriptTemplate) {
@@ -60,14 +60,14 @@ public class FridaScriptDialog extends JDialog {
         JScrollPane treeScrollPane = new JScrollPane(scriptTree);
         treeScrollPane.setPreferredSize(new Dimension(300, 0));
 
-        // 创建脚本显示区域
+        // Create script display area
         scriptTextArea = new JTextArea();
         scriptTextArea.setEditable(false);
         
-        // 设置字体，支持中文显示
+        // Set font for Chinese character support
         Font font = new Font("Microsoft YaHei UI", Font.PLAIN, 13);
         if (font.getFamily().equals("Dialog")) {
-            // 如果微软雅黑不可用，使用默认等宽字体
+            // If Microsoft YaHei UI not available, use default monospaced font
             font = new Font("Monospaced", Font.PLAIN, 12);
         }
         scriptTextArea.setFont(font);
@@ -76,7 +76,7 @@ public class FridaScriptDialog extends JDialog {
 
         JScrollPane textScrollPane = new JScrollPane(scriptTextArea);
 
-        // 创建操作按钮面板
+        // Create operation button panel
         JPanel buttonPanel = new JPanel(new BorderLayout());
         
         // Left side buttons (Language, Expand/Collapse)
@@ -105,11 +105,11 @@ public class FridaScriptDialog extends JDialog {
         buttonPanel.add(leftPanel, BorderLayout.WEST);
         buttonPanel.add(rightPanel, BorderLayout.EAST);
 
-        // 创建分割面板
+        // Create split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScrollPane, textScrollPane);
         splitPane.setDividerLocation(300);
 
-        // 添加组件
+        // Add components
         add(splitPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -121,8 +121,8 @@ public class FridaScriptDialog extends JDialog {
         logger.info("Loading Frida script templates...");
         boolean isEnglish = config.isEnglish();
         
-        // Category 1: Helper Functions (辅助函数)
-        String helperTitle = isEnglish ? "1. Helper Functions" : "1. 辅助函数";
+        // Category 1: Helper Functions
+        String helperTitle = isEnglish ? "1. Helper Functions" : "1. 常用辅助函数";
         DefaultMutableTreeNode helperNode = new DefaultMutableTreeNode(helperTitle);
         helperNode.add(createScriptNode(HelperFunctions.PRINT_STACKTRACE));
         helperNode.add(createScriptNode(HelperFunctions.PRINT_ARGS));
@@ -170,11 +170,11 @@ public class FridaScriptDialog extends JDialog {
     }
 
     /**
-     * 显示脚本内容
+     * display Script Code
      */
     private void displayScript(ScriptTemplate template) {
         scriptTextArea.setText(template.getScript());
-        scriptTextArea.setCaretPosition(0); // 滚动到顶部
+        scriptTextArea.setCaretPosition(0); // Scroll to top
     }
 
     /**

@@ -5,6 +5,9 @@ import jadx.api.plugins.JadxPluginContext;
 import jadx.api.plugins.JadxPluginInfo;
 import jadx.api.plugins.JadxPluginInfoBuilder;
 import jadx.gui.ui.MainWindow;
+import jadx.gui.settings.JadxSettings;
+import jadx.api.plugins.gui.JadxGuiContext;
+import jadx.gui.utils.LangLocale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,7 @@ import java.awt.event.KeyEvent;
 
 /**
  * JADX Frida Hook All Plugin
- * 提供 JDK、Android API 和 JNI Hook 脚本模板
+ * Provides Frida Hook script templates for JDK, Android APIs and JNI
  */
 public class JadxFridaHookAll implements JadxPlugin {
     
@@ -24,17 +27,19 @@ public class JadxFridaHookAll implements JadxPlugin {
     private MainWindow mainWindow;
     private FridaScriptDialog scriptDialog;
     private PluginConfig config;
+    private JadxGuiContext guiContext;
 
     @Override
     public void init(JadxPluginContext context) {
-        // 检查 GUI 上下文
+        // Check GUI context
         if (context.getGuiContext() == null) {
             logger.info("Frida HookAll Plugin: Running in non-GUI mode, plugin features disabled.");
             return;
         }
 
         try {
-            this.mainWindow = (MainWindow) context.getGuiContext().getMainFrame();
+            this.guiContext = context.getGuiContext();
+            this.mainWindow = (MainWindow) guiContext.getMainFrame();
             if (this.mainWindow == null) {
                 logger.error("Frida HookAll Plugin: Main window is null.");
                 return;
@@ -42,11 +47,12 @@ public class JadxFridaHookAll implements JadxPlugin {
 
             logger.info("Frida HookAll Plugin: Initializing...");
             
-            // Initialize configuration
+            // Initialize configuration with JADX language settings
             config = new PluginConfig();
+            autoDetectLanguage();
             logger.info("Plugin configuration loaded. Language: {}", config.getLanguage());
             
-            // 添加菜单项
+            // Add menu items
             addMenuItems();
             
             logger.info("Frida HookAll Plugin: Initialized successfully.");
@@ -59,14 +65,38 @@ public class JadxFridaHookAll implements JadxPlugin {
     @Override
     public JadxPluginInfo getPluginInfo() {
         return JadxPluginInfoBuilder.pluginId(PLUGIN_ID)
-                .name("JADX Frida HookAll")
-                .description("Frida Hook script templates for JDK, Android APIs and JNI")
-                .homepage("https://github.com/your-repo/jadx-frida-hookall")
+                .name("Frida HookAll")
+                .description("Frida Hook script templates for Java/Android reverse engineering.\nCtrl+Alt+H to open.\nAuthor: x1a0f3n9(LunFengChen)\nversion: 1.0.0")
+                .homepage("https://github.com/LunFengChen/jadx-frida-hookAll")
                 .build();
     }
 
     /**
-     * 添加菜单项和快捷键
+     * Auto-detect language from JADX settings
+     */
+    private void autoDetectLanguage() {
+        try {
+            JadxSettings settings = mainWindow.getSettings();
+            if (settings != null) {
+                LangLocale langLocale = settings.getLangLocale();
+                String langCode = langLocale.get().getLanguage();
+                
+                // If JADX is set to Chinese, use Chinese; otherwise use English
+                if ("zh".equals(langCode)) {
+                    config.setLanguage("zh");
+                    logger.info("Auto-detected Chinese language from JADX settings");
+                } else {
+                    config.setLanguage("en");
+                    logger.info("Auto-detected non-Chinese language from JADX settings, using English");
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to auto-detect language, using default: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Add menu items and keyboard shortcuts
      */
     private void addMenuItems() {
         SwingUtilities.invokeLater(() -> {
@@ -77,13 +107,13 @@ public class JadxFridaHookAll implements JadxPlugin {
                     return;
                 }
 
-                // 查找或创建 Plugins 菜单
+                // Find or create Plugins menu
                 JMenu pluginsMenu = findOrCreatePluginsMenu(menuBar);
 
-                // 创建 Frida HookAll 菜单项
+                // Create Frida HookAll menu item
                 JMenuItem fridaMenuItem = new JMenuItem("Frida Hook Templates");
                 
-                // 添加快捷键 Ctrl+Alt+H (H for Hook)
+                // Add shortcut Ctrl+Alt+H (H for Hook)
                 fridaMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                         KeyEvent.VK_H, 
                         ActionEvent.CTRL_MASK | ActionEvent.ALT_MASK));
@@ -101,10 +131,10 @@ public class JadxFridaHookAll implements JadxPlugin {
     }
 
     /**
-     * 查找或创建 Plugins 菜单
+     * Find or create Plugins menu
      */
     private JMenu findOrCreatePluginsMenu(JMenuBar menuBar) {
-        // 查找现有的 Plugins 菜单
+        // Find existing Plugins menu
         for (int i = 0; i < menuBar.getMenuCount(); i++) {
             JMenu menu = menuBar.getMenu(i);
             if (menu != null && ("Plugins".equals(menu.getText()) || "Plugin".equals(menu.getText()))) {
@@ -112,10 +142,10 @@ public class JadxFridaHookAll implements JadxPlugin {
             }
         }
 
-        // 创建新的 Plugins 菜单
+        // Create new Plugins menu
         JMenu pluginsMenu = new JMenu("Plugins");
 
-        // 尝试在 Help 菜单前插入
+        // Try to insert before Help menu
         boolean inserted = false;
         for (int i = 0; i < menuBar.getMenuCount(); i++) {
             JMenu menu = menuBar.getMenu(i);
@@ -134,7 +164,7 @@ public class JadxFridaHookAll implements JadxPlugin {
     }
 
     /**
-     * 显示 Frida 脚本对话框
+     * Show Frida script dialog
      */
     private void showFridaScriptDialog() {
         if (scriptDialog == null) {

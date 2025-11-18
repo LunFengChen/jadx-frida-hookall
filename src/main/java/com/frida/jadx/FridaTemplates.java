@@ -4,7 +4,7 @@ package com.frida.jadx;
  * Frida Hook Script Template Library
  * 
  * This is the main entry point that organizes scripts into 4 categories:
- * 1. Helper Functions (辅助函数) - Utility functions
+ * 1. Helper Functions  - Utility functions
  * 2. Hook JDK - Java standard library hooks
  * 3. Hook Android - Android framework hooks
  * 4. Frida Advanced - Advanced Frida features (JNI, Native, etc.)
