@@ -3,11 +3,14 @@ package com.frida.jadx;
 import com.frida.jadx.templates.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rtextarea.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.lang.reflect.Method;
 
 /**
  * Frida script library dialog
@@ -18,19 +21,23 @@ public class FridaScriptDialog extends JDialog {
     private static final Logger logger = LoggerFactory.getLogger(FridaScriptDialog.class);
     
     private JTree scriptTree;
-    private JTextArea scriptTextArea;
+    private RSyntaxTextArea scriptTextArea;
     private DefaultMutableTreeNode rootNode;
     private PluginConfig config;
+    private jadx.gui.settings.JadxSettings settings;
     private JButton copyButton;
     private JButton copyWithoutCommentsButton;
     private JButton languageButton;
     private JButton closeButton;
     private JButton expandAllButton;
     private JButton collapseAllButton;
+    private JButton fontIncreaseButton;
+    private JButton fontDecreaseButton;
 
-    public FridaScriptDialog(JFrame parent, PluginConfig config) {
+    public FridaScriptDialog(JFrame parent, PluginConfig config, jadx.gui.settings.JadxSettings settings) {
         super(parent, "Frida实用脚本库", false);
         this.config = config;
+        this.settings = settings;
         initUI();
         loadScriptTemplates();
         updateLanguage(); // Apply language settings
@@ -61,26 +68,69 @@ public class FridaScriptDialog extends JDialog {
         JScrollPane treeScrollPane = new JScrollPane(scriptTree);
         treeScrollPane.setPreferredSize(new Dimension(300, 0));
 
-        // Create script display area
-        scriptTextArea = new JTextArea();
+        // Create script display area using RSyntaxTextArea
+        scriptTextArea = new RSyntaxTextArea();
+        scriptTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT);
+        scriptTextArea.setCodeFoldingEnabled(true);
+        scriptTextArea.setAntiAliasingEnabled(true);
         scriptTextArea.setEditable(false);
         
-        // Set font for Chinese character support
-        Font font = new Font("Microsoft YaHei UI", Font.PLAIN, 13);
-        if (font.getFamily().equals("Dialog")) {
-            // If Microsoft YaHei UI not available, use default monospaced font
-            font = new Font("Monospaced", Font.PLAIN, 12);
+        // Apply Theme based on JADX settings (via Reflection to avoid compilation errors)
+        try {
+            String themePath = null;
+            try {
+                // Try to get editor theme path via reflection
+                Method getEditorThemePath = settings.getClass().getMethod("getEditorThemePath");
+                themePath = (String) getEditorThemePath.invoke(settings);
+            } catch (Exception e) {
+                logger.debug("Could not get editor theme path via reflection", e);
+            }
+
+            boolean isDark = true; // Default to dark
+            if (themePath != null) {
+                isDark = themePath.toLowerCase().contains("dark") || themePath.toLowerCase().contains("darcula");
+            }
+            
+            String themeResource = isDark ? "/org/fife/ui/rsyntaxtextarea/themes/dark.xml" 
+                                          : "/org/fife/ui/rsyntaxtextarea/themes/default.xml";
+            
+            Theme theme = Theme.load(getClass().getResourceAsStream(themeResource));
+            theme.apply(scriptTextArea);
+        } catch (Exception e) {
+            logger.warn("Failed to apply theme to RSyntaxTextArea", e);
+        }
+
+        // Set font from JADX settings
+        Font font = settings.getFont();
+        if (font == null) {
+            font = new Font("Consolas", Font.PLAIN, 13);
+        }
+        
+        // Check if JADX font supports Chinese, if not, fallback to a font that does
+        if (!isChineseSupported(font)) {
+             // Try Microsoft YaHei UI first
+             Font chineseFont = new Font("Microsoft YaHei UI", Font.PLAIN, font.getSize());
+             if (isChineseSupported(chineseFont)) {
+                 font = chineseFont;
+             } else {
+                 // Fallback to SimHei
+                 chineseFont = new Font("SimHei", Font.PLAIN, font.getSize());
+                 if (isChineseSupported(chineseFont)) {
+                    font = chineseFont;
+                 }
+             }
         }
         scriptTextArea.setFont(font);
-        scriptTextArea.setTabSize(4);
+        
         scriptTextArea.setText("Click tree node to view Frida script template");
 
-        JScrollPane textScrollPane = new JScrollPane(scriptTextArea);
+        RTextScrollPane textScrollPane = new RTextScrollPane(scriptTextArea);
+        textScrollPane.setFoldIndicatorEnabled(true);
 
         // Create operation button panel
         JPanel buttonPanel = new JPanel(new BorderLayout());
         
-        // Left side buttons (Language, Expand/Collapse)
+        // Left side buttons (Language, Expand/Collapse, Font Size)
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         languageButton = new JButton();
         languageButton.addActionListener(e -> toggleLanguage());
@@ -93,6 +143,17 @@ public class FridaScriptDialog extends JDialog {
         collapseAllButton = new JButton();
         collapseAllButton.addActionListener(e -> collapseAllNodes());
         leftPanel.add(collapseAllButton);
+
+        // Font size buttons
+        fontIncreaseButton = new JButton("A+");
+        fontIncreaseButton.setMargin(new Insets(2, 5, 2, 5));
+        fontIncreaseButton.addActionListener(e -> modifyFontSize(2.0f));
+        leftPanel.add(fontIncreaseButton);
+
+        fontDecreaseButton = new JButton("A-");
+        fontDecreaseButton.setMargin(new Insets(2, 5, 2, 5));
+        fontDecreaseButton.addActionListener(e -> modifyFontSize(-2.0f));
+        leftPanel.add(fontDecreaseButton);
         
         // Copy and Close buttons (right side)
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -116,6 +177,10 @@ public class FridaScriptDialog extends JDialog {
         // Add components
         add(splitPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private boolean isChineseSupported(Font font) {
+        return font.canDisplay('中');
     }
 
     /**
@@ -324,6 +389,17 @@ public class FridaScriptDialog extends JDialog {
     }
     
     /**
+     * Modify font size
+     */
+    private void modifyFontSize(float delta) {
+        Font font = scriptTextArea.getFont();
+        float newSize = font.getSize() + delta;
+        if (newSize >= 8 && newSize <= 72) {
+            scriptTextArea.setFont(font.deriveFont(newSize));
+        }
+    }
+
+    /**
      * Toggle language between English and Chinese
      */
     private void toggleLanguage() {
@@ -360,8 +436,12 @@ public class FridaScriptDialog extends JDialog {
         expandAllButton.setToolTipText(isEnglish ? "Expand all tree nodes" : "展开所有树节点");
         collapseAllButton.setText(isEnglish ? "Collapse All" : "折叠全部");
         collapseAllButton.setToolTipText(isEnglish ? "Collapse all tree nodes" : "折叠所有树节点");
+        
+        fontIncreaseButton.setToolTipText(isEnglish ? "Increase Font Size" : "放大字体");
+        fontDecreaseButton.setToolTipText(isEnglish ? "Decrease Font Size" : "缩小字体");
+        
         copyButton.setText(isEnglish ? "Copy Script" : "复制脚本");
-        copyWithoutCommentsButton.setText(isEnglish ? "Copy (No Comments)" : "复制（无注释）");
+        copyWithoutCommentsButton.setText(isEnglish ? "Copy (No Comments)" : "复制(无注释)");
         copyWithoutCommentsButton.setToolTipText(isEnglish ? "Copy script without comments" : "复制脚本不包含注释");
         closeButton.setText(isEnglish ? "Close" : "关闭");
         

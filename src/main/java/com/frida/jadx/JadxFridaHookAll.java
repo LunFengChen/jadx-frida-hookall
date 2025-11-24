@@ -169,7 +169,7 @@ public class JadxFridaHookAll implements JadxPlugin {
      */
     private void showFridaScriptDialog() {
         if (scriptDialog == null) {
-            scriptDialog = new FridaScriptDialog(mainWindow, config);
+            scriptDialog = new FridaScriptDialog(mainWindow, config, mainWindow.getSettings());
         }
         scriptDialog.setVisible(true);
     }

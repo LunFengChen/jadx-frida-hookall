@@ -31,6 +31,14 @@
             <version>2.0.9</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- RSyntaxTextArea for Syntax Highlighting -->
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
+            <version>3.3.4</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
