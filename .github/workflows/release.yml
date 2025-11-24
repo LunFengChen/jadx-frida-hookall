@@ -24,12 +24,42 @@ jobs:
       id: get_version
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
     
-    - name: Download JADX GUI JAR
+    - name: Download Latest JADX GUI JAR
       run: |
         mkdir -p lib
-        # 下载最新的 JADX dev 版本
-        wget -O lib/jadx-gui.jar https://github.com/LunFengChen/jadx/releases/latest/download/jadx-gui-dev-all.jar || \
-        wget -O lib/jadx-gui.jar https://github.com/skylot/jadx/releases/latest/download/jadx-gui-dev-all.jar
+        # Get release info from LunFengChen/jadx
+        RELEASE_JSON=$(curl -s https://api.github.com/repos/LunFengChen/jadx/releases/latest)
+        JADX_TAG=$(echo "$RELEASE_JSON" | jq -r .tag_name)
+        echo "Latest JADX version: $JADX_TAG"
+        
+        # Find a zip asset (e.g. jadx-gui-*-win.zip or jadx-*.zip)
+        DOWNLOAD_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url' | head -n 1)
+        
+        if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" == "null" ]; then
+          echo "Error: No zip file found in release assets."
+          exit 1
+        fi
+
+        echo "Downloading from: $DOWNLOAD_URL"
+        wget -O jadx_dist.zip "$DOWNLOAD_URL"
+        
+        # Unzip and find jar
+        unzip -q jadx_dist.zip -d jadx_temp
+        
+        # Find the main jar (e.g., jadx-dev-all.jar or jadx-gui-*.jar) inside the extracted folder (likely in lib/)
+        JAR_FILE=$(find jadx_temp -name "*.jar" | grep -v "sources" | grep -v "javadoc" | head -n 1)
+        
+        if [ -z "$JAR_FILE" ]; then
+            echo "Error: No JAR file found in the zip."
+            exit 1
+        fi
+        
+        echo "Found JAR: $JAR_FILE"
+        mv "$JAR_FILE" lib/jadx-gui.jar
+        
+        # Cleanup
+        rm jadx_dist.zip
+        rm -rf jadx_temp
     
     - name: Update version in pom.xml
       run: |
