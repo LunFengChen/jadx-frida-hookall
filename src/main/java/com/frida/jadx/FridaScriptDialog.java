@@ -308,6 +308,8 @@ public class FridaScriptDialog extends JDialog {
         advancedNode.add(createScriptNode(FridaAdvanced.DUMP_DEX_DEFINECLASS, 3));
         advancedNode.add(createScriptNode(FridaAdvanced.DUMP_SO, 4));
         advancedNode.add(createScriptNode(FridaAdvanced.DUMP_ANONYMOUS_MEMORY, 5));
+        advancedNode.add(createScriptNode(FridaAdvanced.ADDRESS_IN_WHICH_SO, 6));
+        advancedNode.add(createScriptNode(FridaAdvanced.HOOK_DLOPEN, 7));
         rootNode.add(advancedNode);
         logger.debug("Loaded {} Hook Advanced scripts", advancedNode.getChildCount());
         

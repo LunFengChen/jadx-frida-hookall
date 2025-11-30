@@ -7,8 +7,9 @@ if ($args.Count -gt 0) {
 } elseif ($env:JADX_GUI_JAR) {
     $jadxGuiJar = $env:JADX_GUI_JAR
 } else {
-    # 默认路径（可根据实际情况修改）
-    $jadxGuiJar = "C:\Users\xiaofeng\Desktop\projects\jadx\jadx-gui\build\libs\jadx-gui-dev-all.jar"
+    # 默认路径（请根据实际情况修改为你的 JADX 路径）
+    # 示例：$jadxGuiJar = "D:\path\to\jadx\jadx-gui\build\libs\jadx-gui-dev-all.jar"
+    $jadxGuiJar = "..\jadx\jadx-gui\build\libs\jadx-gui-dev-all.jar"
 }
 
 # 检查 JADX JAR 是否存在
@@ -51,13 +52,12 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  大小: $([math]::Round($jarFile.Length / 1KB, 2)) KB" -ForegroundColor Gray
     
     Write-Host "`n安装到 JADX:" -ForegroundColor Yellow
-    Write-Host "  方法1 - 命令行:" -ForegroundColor Cyan
-    Write-Host "    cd C:\Users\xiaofeng\Desktop\projects\jadx" -ForegroundColor White
-    Write-Host "    .\gradlew.bat runJadx" -ForegroundColor White
-    Write-Host "    然后在 JADX GUI 中: Plugins -> Install plugin -> 选择上面的 jar 文件`n" -ForegroundColor White
+    Write-Host "  方法1 - JADX GUI 安装:" -ForegroundColor Cyan
+    Write-Host "    在 JADX GUI 中: Plugins -> Install plugin -> 选择上面的 jar 文件`n" -ForegroundColor White
     
     Write-Host "  方法2 - 手动复制:" -ForegroundColor Cyan
-    Write-Host "    将 jar 复制到: C:\Users\xiaofeng\Desktop\projects\jadx\jadx-gui\build\jadx-gui-win\plugins\" -ForegroundColor White
+    Write-Host "    将 jar 复制到 JADX 的 plugins 目录" -ForegroundColor White
+    Write-Host "    Windows: %USERPROFILE%\.jadx\plugins\" -ForegroundColor Gray
     
 } else {
     Write-Host "`n✗ 编译失败" -ForegroundColor Red

@@ -61,4 +61,24 @@ public class FridaAdvanced {
         "Dump匿名内存",
         ScriptLoader.loadScript(BASE_PATH + "06-dump-anonymous-memory.js")
     );
+    
+    /**
+     * Which SO - Find address in module
+     * 查找地址所在的 SO 模块，或验证地址是否在预期的 SO 中
+     */
+    public static final ScriptEntry ADDRESS_IN_WHICH_SO = new ScriptEntry(
+        "Which SO (Address Locator)",
+        "地址定位 - 查找所属SO",
+        ScriptLoader.loadScript(BASE_PATH + "07-address-inWhichSo.js")
+    );
+    
+    /**
+     * Hook dlopen
+     * 监控动态库加载过程，分析加固、反调试等场景
+     */
+    public static final ScriptEntry HOOK_DLOPEN = new ScriptEntry(
+        "Hook dlopen",
+        "Hook SO 加载",
+        ScriptLoader.loadScript(BASE_PATH + "08-hook-dlopen.js")
+    );
 }

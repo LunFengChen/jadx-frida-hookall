@@ -70,46 +70,33 @@ jobs:
         mvn versions:commit
     
     - name: Build with Maven
-      run: |
-        mvn clean package -DskipTests
-        # Rename JAR to match Repo Name (case sensitive)
-        mv target/jadx-frida-hookall-${{ steps.get_version.outputs.VERSION }}.jar target/jadx-frida-hookAll-${{ steps.get_version.outputs.VERSION }}.jar
+      run: mvn clean package -DskipTests
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        files: target/jadx-frida-hookAll-${{ steps.get_version.outputs.VERSION }}.jar
+        files: target/jadx-frida-hookall-${{ steps.get_version.outputs.VERSION }}.jar
+        generate_release_notes: true  # 自动生成 Release Notes
         body: |
-          ## Frida HookAll Plugin v${{ steps.get_version.outputs.VERSION }}
+          ## 📦 JADX Frida HookAll Plugin v${{ steps.get_version.outputs.VERSION }}
           
           ### 安装方法
           
-          **jadx-cli 安装（推荐）：**
+          **方式 1：命令行安装（推荐）**
           ```bash
-          jadx plugins --install "github:LunFengChen:jadx-frida-hookAll"
+          jadx plugins --install "github:LunFengChen:jadx-frida-hookall"
           ```
           
-          **jadx-gui 安装：**
-          1. 打开 JADX GUI → Preferences → Plugins
-          2. 点击 Install plugin 按钮
-          3. 输入：`github:LunFengChen:jadx-frida-hookAll`
-          4. 重启 JADX
-          
-          或者下载 JAR 文件手动安装：
-          1. 下载下方的 `jadx-frida-hookall-${{ steps.get_version.outputs.VERSION }}.jar`
-          2. 在 JADX GUI 中：Plugins → Install plugin → 选择 JAR 文件
+          **方式 2：GUI 安装**
+          1. JADX GUI → `Plugins` → `Install plugin`
+          2. 输入：`github:LunFengChen:jadx-frida-hookall`
           3. 重启 JADX
           
-          ### 功能特性
-          - 🔧 Helper Functions（辅助函数）
-          - 📦 Hook JDK APIs
-          - 📱 Hook Android APIs
-          - ⚡ Frida Advanced APIs (JNI 监控)
-          - 🌐 中英文界面切换
-          - ⌨️ 快捷键支持（Ctrl+Alt+H）
+          **方式 3：手动安装**
+          1. 下载下方的 JAR 文件
+          2. JADX GUI → `Plugins` → `Install plugin` → 选择 JAR 文件
+          3. 重启 JADX
           
-          ### 使用方法
-          - 快捷键：`Ctrl+Alt+H`
-          - 菜单：`Plugins` → `Frida实用脚本库` (Frida Script Library)
+          💡 插件相关介绍请查看 [README](https://github.com/LunFengChen/jadx-frida-hookall#readme)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -39,7 +39,7 @@ GitHub Actions 会自动：
 
 ```bash
 # 使用 jadx-cli 安装测试
-jadx plugins --install "github:LunFengChen:jadx-frida-hookAll"
+jadx plugins --install "github:LunFengChen:jadx-frida-hookall"
 
 # 检查插件列表
 jadx plugins --list
@@ -48,7 +48,7 @@ jadx plugins --list
 或在 JADX GUI 中测试：
 1. 打开 `Preferences` → `Plugins`
 2. 点击 `Install plugin`
-3. 输入：`github:LunFengChen:jadx-frida-hookAll`
+3. 输入：`github:LunFengChen:jadx-frida-hookall`
 4. 验证能否正确下载和安装
 
 ## 手动发布流程
@@ -113,10 +113,10 @@ patch: Bug 修复，向后兼容
 2. 编辑 `plugins-list.json`，添加插件信息：
 ```json
 {
-  "locationId": "github:LunFengChen:jadx-frida-hookAll",
+  "locationId": "github:LunFengChen:jadx-frida-hookall",
   "name": "Frida HookAll",
   "description": "Frida Hook script templates for Java/Android reverse engineering",
-  "homepage": "https://github.com/LunFengChen/jadx-frida-hookAll"
+  "homepage": "https://github.com/LunFengChen/jadx-frida-hookall"
 }
 ```
 3. 提交 PR
@@ -152,7 +152,7 @@ A: 检查：
 
 A: 用户可以指定版本安装：
 ```bash
-jadx plugins --install "github:LunFengChen:jadx-frida-hookAll:1.0.0"
+jadx plugins --install "github:LunFengChen:jadx-frida-hookall:1.0.0"
 ```
 
 **Q: GitHub Actions 编译失败怎么办？**

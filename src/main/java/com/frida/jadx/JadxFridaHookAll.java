@@ -67,7 +67,7 @@ public class JadxFridaHookAll implements JadxPlugin {
         return JadxPluginInfoBuilder.pluginId(PLUGIN_ID)
                 .name("Frida HookAll")
                 .description("Frida Script Library | Frida实用脚本库\nPractical Frida Hook scripts for Java/Android reverse engineering.\nCtrl+Alt+H to open.\nAuthor: x1a0f3n9(LunFengChen)\nversion: 1.0.1")
-                .homepage("https://github.com/LunFengChen/jadx-frida-hookAll")
+                .homepage("https://github.com/LunFengChen/jadx-frida-hookall")
                 .build();
     }
 
@@ -135,10 +135,10 @@ public class JadxFridaHookAll implements JadxPlugin {
      * Find or create Plugins menu
      */
     private JMenu findOrCreatePluginsMenu(JMenuBar menuBar) {
-        // Find existing Plugins menu
+        // Find existing Plugins menu (supports English and Chinese)
         for (int i = 0; i < menuBar.getMenuCount(); i++) {
             JMenu menu = menuBar.getMenu(i);
-            if (menu != null && ("Plugins".equals(menu.getText()) || "Plugin".equals(menu.getText()))) {
+            if (menu != null && ("Plugins".equals(menu.getText()) || "Plugin".equals(menu.getText()) || "插件".equals(menu.getText()))) {
                 return menu;
             }
         }
@@ -146,11 +146,11 @@ public class JadxFridaHookAll implements JadxPlugin {
         // Create new Plugins menu
         JMenu pluginsMenu = new JMenu("Plugins");
 
-        // Try to insert before Help menu
+        // Try to insert before Help menu (supports English and Chinese)
         boolean inserted = false;
         for (int i = 0; i < menuBar.getMenuCount(); i++) {
             JMenu menu = menuBar.getMenu(i);
-            if (menu != null && "Help".equals(menu.getText())) {
+            if (menu != null && ("Help".equals(menu.getText()) || "帮助".equals(menu.getText()))) {
                 menuBar.add(pluginsMenu, i);
                 inserted = true;
                 break;

@@ -14,7 +14,7 @@
 ### 方案 2：使用本项目的 JADX 插件
 
 - **Ctrl+Alt+H**：一键调出常用脚本库
-- **8 大分类**：持续完善中（目前包含常用 54 个脚本）
+- **8 大分类**：持续完善中（目前包含常用 56 个脚本）
 
 ## ✨ 插件达到的效果
 
@@ -30,13 +30,13 @@
 ### 方式 1：命令行安装（推荐）
 
 ```bash
-jadx plugins --install "github:LunFengChen:jadx-frida-hookAll"
+jadx plugins --install "github:LunFengChen:jadx-frida-hookall"
 ```
 
 ### 方式 2：GUI 安装
 
 1. JADX GUI → `Plugins` → `Install plugin`
-2. 输入：`github:LunFengChen:jadx-frida-hookAll`
+2. 输入：`github:LunFengChen:jadx-frida-hookall`
 3. 重启 JADX
 
 > 📌 **TODO**: 后续将提交到 [JADX 官方插件市场](https://github.com/jadx-decompiler/jadx-plugins-list)，届时可直接在 JADX 中一键安装
@@ -49,11 +49,11 @@ jadx plugins --install "github:LunFengChen:jadx-frida-hookAll"
 
 ## 💬 反馈与交流
 
-- **提交 Issue**：发现 Bug 或有建议？前往 [GitHub Issues](https://github.com/LunFengChen/jadx-frida-hookAll/issues)
+- **提交 Issue**：发现 Bug 或有建议？前往 [GitHub Issues](https://github.com/LunFengChen/jadx-frida-hookall/issues)
 - **贡献脚本**：欢迎贡献更多实用脚本！
-  1. 将 `.js` 脚本添加到 [`frida-scripts`](https://github.com/LunFengChen/jadx-frida-hookAll/tree/master/src/main/resources/frida-scripts) 对应分类目录
-  2. 在 [`templates`](https://github.com/LunFengChen/jadx-frida-hookAll/tree/master/src/main/java/com/frida/jadx/templates) 中注册脚本
-  3. 在 [`FridaScriptDialog.java`](https://github.com/LunFengChen/jadx-frida-hookAll/blob/master/src/main/java/com/frida/jadx/FridaScriptDialog.java) 中添加到 UI 树
+  1. 将 `.js` 脚本添加到 [`frida-scripts`](https://github.com/LunFengChen/jadx-frida-hookall/tree/master/src/main/resources/frida-scripts) 对应分类目录
+  2. 在 [`templates`](https://github.com/LunFengChen/jadx-frida-hookall/tree/master/src/main/java/com/frida/jadx/templates) 中注册脚本
+  3. 在 [`FridaScriptDialog.java`](https://github.com/LunFengChen/jadx-frida-hookall/blob/master/src/main/java/com/frida/jadx/FridaScriptDialog.java) 中添加到 UI 树
   4. 提交 Pull Request
 - **QQ 交流群**：686725227
 
