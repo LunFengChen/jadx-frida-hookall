@@ -1,6 +1,6 @@
 /**
  * 绕过移动安全联盟frida检测的脚本
- * 对应的so是libmsaoaidsec.so, 旧版本是libsecsdk.so(简单魔改特征或者置空so就行)
+ * 对应的so是libmsaoaidsec.so(最稳的是linker方案,其余方案在某些设备可用), 旧版本是libsecsdk.so(简单魔改特征或者置空so就行)
  */
 
 function hook_dlopen() {
@@ -18,10 +18,10 @@ function hook_dlopen() {
                 hook_call_constructors_bypass_msa();
 
                 // 通用2: 空替换(小部分情况不稳定)
-                // replace_loadso(args[0], "");
+                // args[0] = replace_loadso(args[0], "");
 
                 // 通用3: 重定向libc, 这里是后者(小部分情况不稳定)
-                // replace_loadso(args[0], "libc.so");
+                // args[0] = replace_loadso(args[0], "libc.so");
 
 
                 // 不通用思路4: 杀线程(检测到异常线程创建给他干掉)
@@ -103,7 +103,7 @@ function hook_call_constructors_bypass_msa() {
 function replace_loadso(address_arg0, replace_libname){
     // 如果没报错 a)正常使用 b)不正常, 说明这个so不是关键的那一个  如果报错, 就是关键的so
     console.warn(`[!] replace so! ${address_arg0.readCString()} -> ${replace_libname}`);
-    var address_arg0 = Memory.allocUtf8String(replace_libname);
+    return Memory.allocUtf8String(replace_libname);
 };
 
 
