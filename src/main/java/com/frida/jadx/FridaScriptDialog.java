@@ -319,6 +319,7 @@ public class FridaScriptDialog extends JDialog {
         bypassNode.add(createScriptNode(BypassCheck.BYPASS_ROOT_DETECTION, 0));
         bypassNode.add(createScriptNode(BypassCheck.BYPASS_SSL_PINNING, 1));
         bypassNode.add(createScriptNode(BypassCheck.BYPASS_MSA_FRIDA_CHECK, 2));
+        bypassNode.add(createScriptNode(BypassCheck.BYPASS_FLUTTER_TLS, 3));
         rootNode.add(bypassNode);
         logger.debug("Loaded {} Bypass Check scripts", bypassNode.getChildCount());
 

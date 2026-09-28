@@ -39,4 +39,10 @@ public class BypassCheck {
         "绕过MSA Frida检测",
         ScriptLoader.loadScript(BASE_PATH + "03-bypass-msa-frida-check.js")
     );
+
+    public static final ScriptEntry BYPASS_FLUTTER_TLS = new ScriptEntry(
+        "Bypass Flutter TLS",
+        "绕过Flutter TLS校验",
+        ScriptLoader.loadScript(BASE_PATH + "06-bypass-flutter-tls.js")
+    );
 }
